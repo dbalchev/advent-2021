@@ -1,7 +1,8 @@
 
 mod day_2;
+mod day_3;
 
-use day_2::run_me;
+use day_3::run_me;
 use std::io;
 
 fn main() -> io::Result<()> {
