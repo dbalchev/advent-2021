@@ -7,6 +7,6 @@ use std::fs::File;
 fn test_read() -> io::Result<()>{
     let f = BufReader::new(File::open("tests/dummy-input.txt")?);
     let numbers: Vec<i32> = f.lines().map(|x| x.unwrap().parse().unwrap()).collect();
-    assert_eq!(numbers.into_iter().sum::<i32>(), 7i32);
+    assert_eq!(numbers.into_iter().sum::<i32>(), 6i32);
     Ok(())
 }
