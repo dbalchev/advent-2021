@@ -62,26 +62,21 @@ impl FromStr for Line {
         if x1 == x2 {
             let (y1, y2) = if y1 <= y2 {(y1, y2)} else {(y2, y1)};
             Ok(Line::VerticalLine{x: x1, y1, y2})
+        } else if y1 == y2 {
+            let (x1, x2) = if x1 <= x2 {(x1, x2)} else {(x2, x1)};
+            Ok(Line::HorizontalLine{y: y1, x1, x2})
+        } else if x_delta.abs() != y_delta.abs() {
+            Err(Box::new(LineParsingError::NotParallelOrDiagonal()))
         } else {
-            if y1 == y2 {
-                let (x1, x2) = if x1 <= x2 {(x1, x2)} else {(x2, x1)};
-                Ok(Line::HorizontalLine{y: y1, x1, x2})
+            let (x1, y1, x2, y2) = if x1 < x2 {
+                (x1, y1, x2, y2)
             } else {
-                if x_delta.abs() != y_delta.abs() {
-                    Err(Box::new(LineParsingError::NotParallelOrDiagonal()))
-                } else {
-                    let (x1, y1, x2, y2) = if x1 < x2 {
-                        (x1, y1, x2, y2)
-                    } else {
-                        (x2, y2, x1, y1)
-                    };
-                    let slope = if y1 < y2 {1} else {-1};
-                    let delta = x2 - x1;
-                    Ok(Line::DiagonalLine{x1, y1, slope, delta})
-                }
-            }
+                (x2, y2, x1, y1)
+            };
+            let slope = if y1 < y2 {1} else {-1};
+            let delta = x2 - x1;
+            Ok(Line::DiagonalLine{x1, y1, slope, delta})
         }
-
     }
 }
 
@@ -142,7 +137,6 @@ pub fn run_me() -> MyResult<()> {
     let lines = inputs
         .into_iter()
         .map(|x| Line::from_str(&x))
-        .filter(|x| x.is_ok())
         .collect::<MyResult<Vec<Line>>>()?;
     let parallel_lines: Vec<Line> = lines.iter().filter(|x| !x.is_diagonal()).cloned().collect();
 
