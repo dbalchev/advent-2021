@@ -1,4 +1,5 @@
 use crate::MyResult;
+use ndarray::{arr1, s, Array, Axis, NewAxis};
 use std::env::args;
 use std::fs::File;
 use std::io::BufRead;
@@ -17,29 +18,18 @@ pub fn run_me() -> MyResult<()> {
         .split(",")
         .map(|x| i32::from_str(x).unwrap())
         .collect();
+    let crab_positions = arr1(&crab_positions);
     let min_pos = *crab_positions.iter().min().unwrap();
     let max_pos = *crab_positions.iter().max().unwrap();
+    let pos_range = Array::from_iter(min_pos..=max_pos);
 
-    let best_cost: i32 = (min_pos..=max_pos)
-        .map(|align_target| {
-            crab_positions
-                .iter()
-                .map(|pos| (pos - align_target).abs())
-                .sum()
-        })
-        .min()
-        .unwrap();
-    println!("Task 1: {}", best_cost);
-    let best_cost: i32 = (min_pos..=max_pos)
-        .map(|align_target| {
-            crab_positions
-                .iter()
-                .map(|pos| (pos - align_target).abs())
-                .map(cost_per_step_2)
-                .fold(0i32, |acc, x| acc.checked_add(x).unwrap())
-        })
-        .min()
-        .unwrap();
-    println!("Task 2: {}", best_cost);
+    let deltas = (&crab_positions.slice(s![NewAxis, 0..]) - &pos_range.slice(s![0.., NewAxis]))
+        .mapv(|x| x.abs());
+    let delta_sum = deltas.sum_axis(Axis(1));
+    let best_cost_1 = delta_sum.iter().min().unwrap();
+    println!("Task 1: {}", best_cost_1);
+    let delta_sum = deltas.mapv(cost_per_step_2).sum_axis(Axis(1));
+    let best_cost_2 = delta_sum.iter().min().unwrap();
+    println!("Task 2: {}", best_cost_2);
     Ok(())
 }
