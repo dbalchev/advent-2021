@@ -6,8 +6,9 @@ mod day_3;
 mod day_4;
 mod day_5;
 mod day_6;
+mod day_7;
 
-use day_6::run_me;
+use day_7::run_me;
 use crate::common::{MyResult, make_my_result};
 
 
