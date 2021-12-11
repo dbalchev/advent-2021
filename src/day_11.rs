@@ -23,8 +23,8 @@ fn step(energy_levels: &mut Array2<i32>) -> i32 {
     *energy_levels += 1;
     let mut flash_locations: Vec<(i32, i32)> = energy_levels
         .indexed_iter()
-        .filter_map(|((y, x), a)| {
-            if *a > 9 {
+        .filter_map(|((y, x), &a)| {
+            if a > 9 {
                 Some((y as i32, x as i32))
             } else {
                 None
