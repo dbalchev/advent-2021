@@ -13,7 +13,7 @@ struct Fold {
     place: i32,
 }
 
-fn count_dots_after_folds(mut dot_coords: Array2<i32>, folds: &[Fold]) -> i32 {
+fn compute_dots_after_folds(mut dot_coords: Array2<i32>, folds: &[Fold]) -> Array2<i32> {
     for Fold { axis, place } in folds {
         for x in dot_coords.index_axis_mut(Axis(1), *axis as usize) {
             if *x > *place {
@@ -22,10 +22,6 @@ fn count_dots_after_folds(mut dot_coords: Array2<i32>, folds: &[Fold]) -> i32 {
         }
     }
     dot_coords
-        .axis_iter(Axis(0))
-        .map(|x| x.to_vec())
-        .collect::<HashSet<Vec<i32>>>()
-        .len() as i32
 }
 
 pub fn run_me(reader: impl BufRead) -> MyResult<()> {
@@ -74,7 +70,32 @@ pub fn run_me(reader: impl BufRead) -> MyResult<()> {
     // println!("{:?}", dot_coords);
     println!(
         "Task 1: {}",
-        count_dots_after_folds(dot_coords, &folds[..1])
+        compute_dots_after_folds(dot_coords.clone(), &folds[..1])
+            .axis_iter(Axis(0))
+            .map(|x| x.to_vec())
+            .collect::<HashSet<Vec<i32>>>()
+            .len()
     );
+    let folded_dot_coords = compute_dots_after_folds(dot_coords, &folds);
+    let max_x = folded_dot_coords
+        .index_axis(Axis(1), 0)
+        .iter()
+        .max()
+        .ok_or(GeneralError(String::from("empty coords")))?
+        + 1;
+    let max_y = folded_dot_coords
+        .index_axis(Axis(1), 1)
+        .iter()
+        .max()
+        .ok_or(GeneralError(String::from("empty coords")))?
+        + 1;
+    let mut bitmap = Array2::from_elem((max_y as usize, max_x as usize), b'.');
+    for dot in folded_dot_coords.axis_iter(Axis(0)) {
+        bitmap[[dot[1] as usize, dot[0] as usize]] = b'#';
+    }
+    println!("Task 2");
+    for line in bitmap.axis_iter(Axis(0)) {
+        println!("{}", String::from_utf8(line.to_vec())?);
+    }
     Ok(())
 }
