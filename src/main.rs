@@ -12,12 +12,33 @@ mod day_9;
 mod day_10;
 mod day_11;
 mod day_12;
+mod day_13;
 
-use day_12::run_me;
+use std::io::BufReader;
+use std::fs::File;
+use std::error::Error;
+use std::fmt::Display;
+use std::env::args;
+use day_13::run_me;
 use crate::common::{MyResult, make_my_result};
 
 
+#[derive(Debug)]
+struct NotEnoughArgsError;
+
+impl Display for NotEnoughArgsError {
+    
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> { 
+        write!(f, "{:?}", self)
+    }
+}
+
+impl Error for NotEnoughArgsError{}
+
+
 fn main() -> MyResult<()> {
-    run_me()?;
+    let input_filename = args().nth(1).ok_or(NotEnoughArgsError)?;
+    let reader = BufReader::new(File::open(input_filename)?);
+    run_me(reader)?;
     Ok(())
 }
