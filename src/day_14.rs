@@ -37,6 +37,25 @@ fn compute_char_counts(count_map: CountMap, first_char: u8, last_char: u8) -> [u
     result
 }
 
+fn solve(
+    mut count_map: CountMap,
+    transform_map: &TransformMap,
+    template: &[u8],
+    n_steps: u32,
+) -> MyResult<(u64, u64)> {
+    for _ in 0..n_steps {
+        count_map = do_step(transform_map, count_map);
+    }
+    let char_counts = compute_char_counts(count_map, template[0], template[template.len() - 1]);
+    let &max_count = char_counts.iter().max().ok_or(format!("Empty counts"))?;
+    let &min_count = char_counts
+        .iter()
+        .filter(|x| **x > 0)
+        .min()
+        .ok_or(format!("Empty counts"))?;
+    Ok((max_count, min_count))
+}
+
 pub fn run_me(reader: impl BufRead) -> MyResult<()> {
     let mut lines = reader.lines();
     let template = lines.next().ok_or(format!("no first line"))??.into_bytes();
@@ -69,20 +88,14 @@ pub fn run_me(reader: impl BufRead) -> MyResult<()> {
     {
         *initial_count_map.entry((c1, c2)).or_default() += 1;
     }
-    let mut count_map = initial_count_map.clone();
-    for _ in 0..10 {
-        count_map = do_step(&transform_map, count_map);
-    }
-    let char_counts = compute_char_counts(count_map, template[0], template[template.len() - 1]);
-    let &max_count = char_counts.iter().max().ok_or(format!("Empty counts"))?;
-    let &min_count = char_counts
-        .iter()
-        .filter(|x| **x > 0)
-        .min()
-        .ok_or(format!("Empty counts"))?;
-    println!("{} {}", max_count, min_count);
 
+    let (max_count, min_count) = solve(initial_count_map.clone(), &transform_map, &template, 10)?;
+    println!("{} {}", max_count, min_count);
     println!("Task 1: {}", max_count - min_count);
+
+    let (max_count, min_count) = solve(initial_count_map.clone(), &transform_map, &template, 40)?;
+    println!("{} {}", max_count, min_count);
+    println!("Task 2: {}", max_count - min_count);
 
     Ok(())
 }
