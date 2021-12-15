@@ -7,22 +7,7 @@ use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use std::io::BufRead;
 
-pub fn run_me(reader: impl BufRead) -> MyResult<()> {
-    let risk_level_rows = reader
-        .lines()
-        .map(|line| {
-            Ok(line?
-                .chars()
-                .map(|c| c as i32 - '0' as i32)
-                .collect::<Array1<i32>>())
-        })
-        .collect::<MyResult<Vec<Array1<i32>>>>()?;
-    let risk_level = stack(
-        Axis(0),
-        &risk_level_rows.iter().map(Array1::view).collect::<Vec<_>>(),
-    )?;
-    // println!("{:?}", risk_level);
-
+fn explore(risk_level: &Array2<i32>) -> i32 {
     let mi = risk_level.shape()[0] as i32;
     let mj = risk_level.shape()[1] as i32;
     let mut min_risk = Array2::from_elem((risk_level.shape()[0], risk_level.shape()[1]), i32::MAX);
@@ -50,7 +35,26 @@ pub fn run_me(reader: impl BufRead) -> MyResult<()> {
             }
         }
     }
-    println!("Task 1: {}", min_risk[[mi as usize - 1, mj as usize - 1]]);
+    min_risk[[mi as usize - 1, mj as usize - 1]]
+}
+
+pub fn run_me(reader: impl BufRead) -> MyResult<()> {
+    let risk_level_rows = reader
+        .lines()
+        .map(|line| {
+            Ok(line?
+                .chars()
+                .map(|c| c as i32 - '0' as i32)
+                .collect::<Array1<i32>>())
+        })
+        .collect::<MyResult<Vec<Array1<i32>>>>()?;
+    let risk_level = stack(
+        Axis(0),
+        &risk_level_rows.iter().map(Array1::view).collect::<Vec<_>>(),
+    )?;
+    // println!("{:?}", risk_level);
+
+    println!("Task 1: {}", explore(&risk_level));
 
     Ok(())
 }
