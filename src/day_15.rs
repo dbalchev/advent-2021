@@ -1,8 +1,8 @@
 use crate::MyResult;
-use ndarray::stack;
 use ndarray::Array1;
 use ndarray::Array2;
 use ndarray::Axis;
+use ndarray::{concatenate, stack};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use std::io::BufRead;
@@ -55,6 +55,30 @@ pub fn run_me(reader: impl BufRead) -> MyResult<()> {
     // println!("{:?}", risk_level);
 
     println!("Task 1: {}", explore(&risk_level));
+
+    let risk_level = concatenate![
+        Axis(0),
+        risk_level.clone(),
+        risk_level.clone() + 1,
+        risk_level.clone() + 2,
+        risk_level.clone() + 3,
+        risk_level.clone() + 4
+    ];
+    let mut risk_level = concatenate![
+        Axis(1),
+        risk_level.clone(),
+        risk_level.clone() + 1,
+        risk_level.clone() + 2,
+        risk_level.clone() + 3,
+        risk_level.clone() + 4
+    ];
+    risk_level.iter_mut().for_each(|x| {
+        *x = 1 + (*x - 1) % 9;
+    });
+
+    // println!("{:?}", risk_level);
+
+    println!("Task 2: {}", explore(&risk_level));
 
     Ok(())
 }
