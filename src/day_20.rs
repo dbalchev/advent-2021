@@ -1,8 +1,8 @@
-use crate::MyResult;
-use itertools::iterate;
 use itertools::Itertools;
-use ndarray::Dimension;
-use ndarray::{s, stack, Array1, Array2, Axis, Zip};
+use ndarray::{s, stack, Array1, Array2, Axis, Dimension, Zip};
+
+use crate::MyResult;
+
 use std::io::{BufRead, Result as IOResult};
 
 fn enchance(image: Array2<u8>, lookup: &[u8], padding: u8) -> (Array2<u8>, u8) {
