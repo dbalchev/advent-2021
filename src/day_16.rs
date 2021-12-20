@@ -73,6 +73,22 @@ fn sum_version(packet: &Packet) -> i32 {
         }
 }
 
+fn eval(packet: &Packet) -> i64 {
+    match packet.content {
+        Content::Literal(x) => x,
+        Content::Subpackets(ref items) => match packet.type_id {
+            0 => items.iter().map(eval).sum(),
+            1 => items.iter().map(eval).product(),
+            2 => items.iter().map(eval).min().unwrap(),
+            3 => items.iter().map(eval).max().unwrap(),
+            5 => (eval(&items[0]) > eval(&items[1])) as i64,
+            6 => (eval(&items[0]) < eval(&items[1])) as i64,
+            7 => (eval(&items[0]) == eval(&items[1])) as i64,
+            ti => panic!("not implemented {}", ti),
+        },
+    }
+}
+
 pub fn run_me(reader: impl BufRead) -> MyResult<()> {
     let hex_input = reader.lines().next().ok_or(format!("empty input"))??;
     let mut binary_input = hex_input
@@ -88,5 +104,7 @@ pub fn run_me(reader: impl BufRead) -> MyResult<()> {
     let packet = read_packet(&mut binary_input)?;
     // println!("{:?}", packet);
     println!("Task 1: {}", sum_version(&packet));
+    println!("Task 2: {}", eval(&packet));
+
     Ok(())
 }
