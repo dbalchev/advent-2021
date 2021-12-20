@@ -27,7 +27,7 @@ use std::fs::File;
 use std::error::Error;
 use std::fmt::Display;
 use std::env::args;
-use day_20::run_me;
+use day_16::run_me;
 use crate::common::{MyResult, make_my_result};
 
 
