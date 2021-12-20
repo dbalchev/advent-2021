@@ -42,6 +42,13 @@ pub fn run_me(reader: impl BufRead) -> MyResult<()> {
 
     println!("Task 1: {:?}", my);
 
+    let nys = (-1000..1000)
+        .cartesian_product(-1000..1000)
+        .filter_map(|(ivx, ivy)| simulate(ivx, ivy, &x_target, &y_target))
+        .count();
+
+    println!("Task 2: {:?}", nys);
+
     // println!("{:?}", simulate(6, 9, &x_target, &y_target));
     Ok(())
 }
