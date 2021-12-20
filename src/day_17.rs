@@ -6,22 +6,43 @@ use std::io::BufRead;
 use std::ops::RangeInclusive;
 use std::str::FromStr;
 
+#[derive(Clone, Copy)]
+struct State {
+    x: i32,
+    y: i32,
+    vx: i32,
+    vy: i32,
+    my: i32,
+}
+
 fn simulate(
     ivx: i32,
     ivy: i32,
     x_target: &RangeInclusive<i32>,
     y_target: &RangeInclusive<i32>,
 ) -> Option<i32> {
-    let step = |&(x, y, vx, vy, my): &(i32, i32, i32, i32, i32)| {
-        return (x + vx, y + vy, (vx - 1).max(0), vy - 1, y.max(my));
+    let step = |&State { x, y, vx, vy, my }: &State| State {
+        x: x + vx,
+        y: y + vy,
+        vx: (vx - 1).max(0),
+        vy: vy - 1,
+        my: y.max(my),
     };
-    iterate((0, 0, ivx, ivy, 0), step)
-        // .inspect(|t| println!("{:?} {:?} {:?}", t, x_target.end(), y_target.end()))
-        .take_while(|&(x, y, _, _, _)| x <= *x_target.end() && y >= *y_target.start())
-        .filter(|(x, y, _, _, my)| x_target.contains(&x) && y_target.contains(&y))
-        // .inspect(|t| println!("{:?}", t))
-        .map(|t| t.4)
-        .next()
+    iterate(
+        State {
+            x: 0,
+            y: 0,
+            vx: ivx,
+            vy: ivy,
+            my: 0,
+        },
+        step,
+    )
+    .take_while(|&State { x, y, .. }| x <= *x_target.end() && y >= *y_target.start())
+    .filter(|State { x, y, .. }| x_target.contains(&x) && y_target.contains(&y))
+    // .inspect(|t| println!("{:?}", t))
+    .map(|t| t.my)
+    .next()
 }
 
 pub fn run_me(reader: impl BufRead) -> MyResult<()> {
