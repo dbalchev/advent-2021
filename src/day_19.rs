@@ -143,7 +143,7 @@ pub fn run_me(read: impl BufRead) -> MyResult<()> {
         assert!(found);
     }
     let beakon_set = aligned
-        .into_iter()
+        .iter()
         .flat_map(|Alignment { transformed, .. }| {
             transformed
                 .axis_iter(Axis(0))
@@ -152,5 +152,14 @@ pub fn run_me(read: impl BufRead) -> MyResult<()> {
         })
         .collect::<HashSet<_>>();
     println!("Task 1: {}", beakon_set.len());
+
+    let max_distance = aligned
+        .iter()
+        .combinations(2)
+        .map(|v| (&v[0].delta - &v[1].delta).mapv(i32::abs).sum())
+        .max();
+
+    println!("Task 2: {:?}", max_distance);
+
     Ok(())
 }
