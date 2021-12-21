@@ -20,6 +20,7 @@ mod day_17;
 mod day_18;
 
 mod day_20;
+mod day_21;
 
 
 use std::io::BufReader;
@@ -27,7 +28,7 @@ use std::fs::File;
 use std::error::Error;
 use std::fmt::Display;
 use std::env::args;
-use day_17::run_me;
+use day_21::run_me;
 use crate::common::{MyResult, make_my_result};
 
 
