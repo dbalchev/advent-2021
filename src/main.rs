@@ -1,14 +1,6 @@
 #![allow(dead_code, unused_imports, unused_variables)]
 
 mod common;
-mod day_2;
-mod day_3;
-mod day_4;
-mod day_5;
-mod day_6;
-mod day_7;
-mod day_8;
-mod day_9;
 mod day_10;
 mod day_11;
 mod day_12;
@@ -18,32 +10,36 @@ mod day_15;
 mod day_16;
 mod day_17;
 mod day_18;
-
+mod day_19;
+mod day_2;
 mod day_20;
 mod day_21;
+mod day_3;
+mod day_4;
+mod day_5;
+mod day_6;
+mod day_7;
+mod day_8;
+mod day_9;
 
-
-use std::io::BufReader;
-use std::fs::File;
+use crate::common::{make_my_result, MyResult};
+use day_19::run_me;
+use std::env::args;
 use std::error::Error;
 use std::fmt::Display;
-use std::env::args;
-use day_21::run_me;
-use crate::common::{MyResult, make_my_result};
-
+use std::fs::File;
+use std::io::BufReader;
 
 #[derive(Debug)]
 struct NotEnoughArgsError;
 
 impl Display for NotEnoughArgsError {
-    
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> { 
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "{:?}", self)
     }
 }
 
-impl Error for NotEnoughArgsError{}
-
+impl Error for NotEnoughArgsError {}
 
 fn main() -> MyResult<()> {
     let input_filename = args().nth(1).ok_or(NotEnoughArgsError)?;
