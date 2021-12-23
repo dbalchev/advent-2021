@@ -25,7 +25,7 @@ mod day_8;
 mod day_9;
 
 use crate::common::{make_my_result, MyResult};
-use day_23::run_me;
+use day_18::run_me;
 use std::env::args;
 use std::error::Error;
 use std::fmt::Display;
