@@ -5,7 +5,7 @@ use crate::MyResult;
 use std::io::BufRead;
 use std::mem::replace;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 enum SnailFish {
     Regular(i32),
     Pair([Box<SnailFish>; 2]),
@@ -164,12 +164,29 @@ fn read_snail_fish(input: &str) -> MyResult<SnailFish> {
 }
 
 pub fn run_me(reader: impl BufRead) -> MyResult<()> {
-    let sum = reader
+    let numbers = reader
         .lines()
-        .map(|x| read_snail_fish(&x.unwrap()).unwrap())
-        .reduce(|l, r| l.add(r))
-        .unwrap();
-    println!("Task 1: {}", sum.compute_magnitude());
+        .map(|x| Ok(read_snail_fish(&x?)?))
+        .collect::<MyResult<Vec<_>>>()?;
+
+    println!(
+        "Task 1: {}",
+        numbers
+            .iter()
+            .cloned()
+            .reduce(|l, r| l.add(r))
+            .unwrap()
+            .compute_magnitude()
+    );
+    println!(
+        "Task 2: {:?}",
+        numbers
+            .iter()
+            .combinations(2)
+            .flat_map(|v| [(v[0].clone(), v[1].clone()), (v[1].clone(), v[0].clone())])
+            .map(|(l, r)| l.add(r).compute_magnitude())
+            .max()
+    );
     Ok(())
 }
 
