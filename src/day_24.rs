@@ -182,7 +182,7 @@ pub fn run_me(reader: impl BufRead) -> MyResult<()> {
             .map(|x| x.sum())
             .collect_vec()
     );
-    let mut beam = reverse_memo
+    let beam = reverse_memo
         .index_axis(Axis(0), 0)
         .iter()
         .filter(|x| x.len() > 0)
@@ -191,19 +191,40 @@ pub fn run_me(reader: impl BufRead) -> MyResult<()> {
         .clone();
 
     println!("{:?}", beam);
-    let mut serial_code = Vec::new();
-    for step in 0..14 {
-        let max_digit = beam.iter().map(|&(digit, _)| digit).max().unwrap();
-        beam.retain(|&(digit, _)| digit == max_digit);
-        serial_code.push(max_digit);
-        beam = beam
-            .into_iter()
-            .flat_map(|(_, next_z)| reverse_memo[[step as usize + 1, next_z as usize]].clone())
-            .collect_vec();
+    {
+        let mut max_beam = beam.clone();
+        let mut serial_code = Vec::new();
+        for step in 0..14 {
+            let max_digit = max_beam.iter().map(|&(digit, _)| digit).max().unwrap();
+            max_beam.retain(|&(digit, _)| digit == max_digit);
+            serial_code.push(max_digit);
+            max_beam = max_beam
+                .into_iter()
+                .flat_map(|(_, next_z)| reverse_memo[[step as usize + 1, next_z as usize]].clone())
+                .collect_vec();
+        }
+        println!("{}", serial_code.len());
+        println!("{:?}", serial_code);
+        println!("Task 1 {:?}", serial_code.into_iter().join(""));
     }
-    println!("{}", serial_code.len());
-    println!("{:?}", serial_code);
-    println!("{:?}", serial_code.into_iter().join(""));
+
+    {
+        let mut min_beam = beam.clone();
+        let mut serial_code = Vec::new();
+        for step in 0..14 {
+            let max_digit = min_beam.iter().map(|&(digit, _)| digit).min().unwrap();
+            min_beam.retain(|&(digit, _)| digit == max_digit);
+            serial_code.push(max_digit);
+            min_beam = min_beam
+                .into_iter()
+                .flat_map(|(_, next_z)| reverse_memo[[step as usize + 1, next_z as usize]].clone())
+                .collect_vec();
+        }
+        println!("{}", serial_code.len());
+        println!("{:?}", serial_code);
+        println!("Task 2 {:?}", serial_code.into_iter().join(""));
+    }
+
     Ok(())
 }
 
