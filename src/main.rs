@@ -1,6 +1,7 @@
 #![allow(dead_code, unused_imports, unused_variables)]
 
 mod common;
+mod day_1;
 mod day_10;
 mod day_11;
 mod day_12;
@@ -27,7 +28,7 @@ mod day_8;
 mod day_9;
 
 use crate::common::{make_my_result, MyResult};
-use day_9::run_me;
+use day_1::run_me;
 use std::env::args;
 use std::error::Error;
 use std::fmt::Display;
