@@ -1,15 +1,41 @@
 use crate::MyResult;
+use itertools::Itertools;
 use ndarray::Array2;
 use ndarray::Axis;
 use ndarray::Zip;
 use ndarray::{concatenate, s, stack, Array1};
-use std::env::args;
-use std::fs::File;
+use std::collections::HashMap;
 use std::io::BufRead;
-use std::io::BufReader;
 
-pub fn run_me() -> MyResult<()> {
-    let map_rows = BufReader::new(File::open(args().nth(1).unwrap())?)
+fn label_area(is_foreground: &Array2<bool>) -> Array2<i32> {
+    let mut label = is_foreground.mapv(|_| 0);
+    let mut next_label = 1;
+
+    Zip::indexed(is_foreground).for_each(|(i, j), &is_fg| {
+        if is_fg && label[[i, j]] == 0 {
+            let mut stack = vec![(i, j)];
+            let current_label = next_label;
+            next_label += 1;
+            label[[i, j]] = current_label;
+            while let Some((ci, cj)) = stack.pop() {
+                for (di, dj) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
+                    let ni = (ci as i32 + di) as usize;
+                    let nj = (cj as i32 + dj) as usize;
+
+                    if is_foreground[[ni, nj]] && label[[ni, nj]] == 0 {
+                        label[[ni, nj]] = current_label;
+                        stack.push((ni, nj));
+                    }
+                }
+            }
+        }
+    });
+
+    label
+}
+
+pub fn run_me(reader: impl BufRead) -> MyResult<()> {
+    let map_rows = reader
         .lines()
         .map(|line| {
             line.unwrap()
@@ -42,6 +68,26 @@ pub fn run_me() -> MyResult<()> {
         .map(|w| w[[1, 1]] + 1)
         .sum();
     println!("Task 1: {}", solution_1);
+
+    let labels = label_area(&padded_map.mapv(|x| x < 9));
+    let area_sizes = {
+        let mut freq = labels
+            .iter()
+            .filter(|&&l| l != 0)
+            .fold(HashMap::new(), |mut counter, &l| {
+                *(counter.entry(l).or_insert(0)) += 1;
+                counter
+            })
+            .values()
+            .cloned()
+            .collect_vec();
+        freq.sort();
+        freq
+    };
+    println!(
+        "Task 2: {}",
+        area_sizes[area_sizes.len() - 3..].iter().product::<i32>()
+    );
     // println!("{:?}", padded_map);
     Ok(())
 }
